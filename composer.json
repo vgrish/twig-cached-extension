@@ -33,6 +33,11 @@
     },
     "autoload": {
         "psr-4": { "Manubo\\Twig\\": "src/Manubo/Twig" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        }
     }
 }
 
