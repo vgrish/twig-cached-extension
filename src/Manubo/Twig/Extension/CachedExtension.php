@@ -70,10 +70,6 @@ class CachedExtension extends \Twig_Extension
         if (is_object($key)) {
             $attrs = ['updated_at', 'modified_at', 'last_updated', 'last_modified'];
             foreach ($attrs as $attr) {
-                if (property_exists($key, $attr)) {
-                    return $this->doCompileKey($key->$attr);
-                }
-
                 if (null !== ($prop = $this->getAttribute($key, $attr))) {
                     return $this->doCompileKey($prop);
                 }
@@ -90,15 +86,29 @@ class CachedExtension extends \Twig_Extension
      */
     protected function getAttribute($entity, $attr)
     {
-        if (property_exists($entity, $attr)) {
+        $camelized = str_replace(' ', '', ucwords(str_replace('_', ' ', $attr)));
+        $camelizedAttr = lcfirst($camelized);
+
+        $objectVars = get_object_vars($entity);
+
+        if (array_key_exists($camelizedAttr, $objectVars)) {
+            return $entity->$camelizedAttr;
+        }
+
+        $objectMethods = get_class_methods($entity);
+
+        $getter = 'get'.$camelized;
+        if (in_array($getter, $objectMethods)) {
+            return $entity->$getter();
+        }
+
+        if (array_key_exists($attr, $objectVars)) {
             return $entity->$attr;
         }
 
-        foreach (['get', 'is'] as $prefix) {
-            $getter = $prefix.str_replace(' ', '', ucwords(str_replace('_', ' ', $attr)));
-            if (method_exists($entity, $getter)) {
-                return $entity->$getter();
-            }
+        $getter = 'get_'.$attr;
+        if (in_array($getter, $objectMethods)) {
+            return $entity->$getter();
         }
 
         return null;
