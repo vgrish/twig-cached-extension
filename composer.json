@@ -12,24 +12,13 @@
         }
     ],
     "minimum-stability": "dev",
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/manubo/psr-cache"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/Crell/Cache"
-        }
-    ],
     "require": {
         "php": ">=5.4.2",
         "twig/twig": "~1.15",
-        "psr/cache": "dev-master"
+        "doctrine/cache": "~1.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4",
-        "manubo/psr-cache": "dev-master"
+        "phpunit/phpunit": "~4"
     },
     "autoload": {
         "psr-4": { "Manubo\\Twig\\": "src/Manubo/Twig" }

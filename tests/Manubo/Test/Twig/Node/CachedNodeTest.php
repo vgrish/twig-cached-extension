@@ -2,7 +2,7 @@
 
 namespace Manubo\Test\Twig\Node;
 
-use Psr\Cache\CacheItemPoolInterface;
+use Doctrine\Common\Cache\Cache;
 use Manubo\Twig\Extension\CachedExtension;
 
 /**
@@ -27,18 +27,18 @@ class CachedNodeTest extends \PHPUnit_Framework_TestCase
         $cachedNode->compile($compiler);
 
         $expected = <<<EOF
-\$_manubo_cached_key = \$this->env->getExtension('manubo_cached_extension')->compileKey(array(0 => "foo", 1 => \$this->getAttribute((isset(\$context["entity"]) ? \$context["entity"] : null), "foo")));
-\$_manubo_cached_item = \$this->env->getExtension('manubo_cached_extension')
-    ->getCache()->getItem(\$_manubo_cached_key);
-if (\$_manubo_cached_item->isHit()) {
-    eval(\$_manubo_cached_item->get());
+\$_manubo_cache = \$this->env->getExtension('manubo_twig_cached_extension')->getCache();
+\$_manubo_cached_key = \$this->env->getExtension('manubo_twig_cached_extension')->compileKey(array(0 => "foo", 1 => \$this->getAttribute((isset(\$context["entity"]) ? \$context["entity"] : null), "foo", array())));
+if (\$_manubo_cache->contains(\$_manubo_cached_key)) {
+    \$_manubo_cached_body = \$_manubo_cache->fetch(\$_manubo_cached_key);
 } else {
-    \$_manubo_cached_item->set('// line 1
-echo "<p>Hello World!</p>";
-');
-    \$_manubo_cached_item->save();
-    eval(\$_manubo_cached_item->get());
+    \$_manubo_cached_body = '    // line 1
+    echo "<p>Hello World!</p>";
+';
+    \$_manubo_cached_ttl = 0;
+    \$_manubo_cache->save(\$_manubo_cached_key, \$_manubo_cached_body, \$_manubo_cached_ttl);
 }
+eval(\$_manubo_cached_body);
 
 EOF;
 
@@ -48,7 +48,7 @@ EOF;
         );
     }
 
-    public function testCompilingCachedTagWithIntTTLCompilesToCodeUsingCacheManager()
+    public function testCompilingCachedTagWithIntTTLCompilesToCodeUsingCache()
     {
         $source = '{% cached ["foo", entity.foo], 10 %}<p>Hello World!</p>{% endcached %}';
         $twig = $this->getEnvironment();
@@ -59,12 +59,12 @@ EOF;
         $cachedNode = $parser->parse($stream)->getNode('body')->getNode(0);
         $cachedNode->compile($compiler);
 
-        $this->assertContains(', 10', $compiler->getSource());
+        $this->assertContains("\$_manubo_cached_ttl = (int) 10;\n", $compiler->getSource());
     }
 
-    public function testCompilingCachedTagWithDateTTLCompilesToCodeUsingCacheManager()
+    public function testCompilingCachedTagWithStringTTLCompilesToCodeUsingCache()
     {
-        $source = '{% cached ["foo", entity.foo], "2014-12-31 07:15:45"|date("Y-m-d H:i:s") %}<p>Hello World!</p>{% endcached %}';
+        $source = '{% cached ["foo", entity.foo], "10" %}<p>Hello World!</p>{% endcached %}';
         $twig = $this->getEnvironment();
         $compiler = new \Twig_Compiler($twig);
         $parser   = new \Twig_parser($twig);
@@ -73,17 +73,12 @@ EOF;
         $cachedNode = $parser->parse($stream)->getNode('body')->getNode(0);
         $cachedNode->compile($compiler);
 
-        $this->assertContains(
-            'twig_date_format_filter($this->env, "2014-12-31 07:15:45", "Y-m-d H:i:s")',
-            $compiler->getSource()
-        );
+        $this->assertContains("\$_manubo_cached_ttl = (int) \"10\";\n", $compiler->getSource());
     }
-
-
 
     protected function getEnvironment()
     {
-        $cacheMock = $this->getMockForAbstractClass(CacheItemPoolInterface::class);
+        $cacheMock = $this->getMockForAbstractClass(Cache::class);
 
         $subEntity = new \stdClass();
         $subEntity->updated_at = 'baz';

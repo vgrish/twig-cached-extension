@@ -2,10 +2,9 @@
 
 namespace Manubo\Test\Twig\Extension;
 
-use Manubo\Cache\Memory\MemoryCacheItem;
-use Manubo\Cache\Memory\MemoryCacheItemPool;
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\Cache;
 use Manubo\Twig\Extension\CachedExtension;
-use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Class CachedExtensionTest
@@ -27,7 +26,7 @@ class CachedExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testCompileKey($cacheKey, $expected)
     {
-        $cacheMock = $this->getMockForAbstractClass(CacheItemPoolInterface::class);
+        $cacheMock = $this->getMockForAbstractClass(Cache::class);
 
         $extension = new CachedExtension($cacheMock);
         $this->assertEquals($expected, $extension->compileKey($cacheKey));
@@ -57,9 +56,10 @@ class CachedExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function getEnvironment()
     {
+        //$cache = '/srv/www/twig-cached-extension/tmp';
         $loader = new \Twig_Loader_Array($this->templates);
         $twig = new \Twig_Environment($loader, ['debug' => true, 'cache' => false, 'autoescape' => false]);
-        $twig->addExtension(new CachedExtension(new MemoryCacheItemPool));
+        $twig->addExtension(new CachedExtension(new ArrayCache));
 
         return $twig;
     }

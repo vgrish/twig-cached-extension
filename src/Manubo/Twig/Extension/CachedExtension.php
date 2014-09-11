@@ -2,7 +2,7 @@
 
 namespace Manubo\Twig\Extension;
 
-use Psr\Cache\CacheItemPoolInterface;
+use Doctrine\Common\Cache\Cache;
 use Manubo\Twig\TokenParser\CachedTokenParser;
 
 /**
@@ -13,7 +13,7 @@ class CachedExtension extends \Twig_Extension
 {
     protected $cache;
 
-    public function __construct(CacheItemPoolInterface $cache)
+    public function __construct(Cache $cache)
     {
         $this->cache = $cache;
     }
@@ -27,7 +27,7 @@ class CachedExtension extends \Twig_Extension
 
     public function getName()
     {
-        return "manubo_cached_extension";
+        return "manubo_twig_cached_extension";
     }
 
     public function getCache()
