@@ -32,13 +32,15 @@ class CachedNodeTest extends \PHPUnit_Framework_TestCase
 if (\$_manubo_cache->contains(\$_manubo_cached_key)) {
     \$_manubo_cached_body = \$_manubo_cache->fetch(\$_manubo_cached_key);
 } else {
-    \$_manubo_cached_body = '    // line 1
+    ob_start();
+    // line 1
     echo "<p>Hello World!</p>";
-';
+    \$_manubo_cached_body = ob_get_contents();
+    ob_end_clean();
     \$_manubo_cached_ttl = 0;
     \$_manubo_cache->save(\$_manubo_cached_key, \$_manubo_cached_body, \$_manubo_cached_ttl);
 }
-eval(\$_manubo_cached_body);
+echo \$_manubo_cached_body;
 
 EOF;
 
