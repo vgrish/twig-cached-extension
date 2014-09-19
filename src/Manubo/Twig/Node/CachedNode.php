@@ -35,9 +35,10 @@ class CachedNode extends \Twig_Node
         $compiler->outdent();
         $compiler->write("} else {\n");
         $compiler->indent();
-        $compiler->write("\$_manubo_cached_body = '");
+        $compiler->write("ob_start();\n");
         $compiler->subcompile($this->getNode('body'));
-        $compiler->raw("';\n");
+        $compiler->write("\$_manubo_cached_body = ob_get_contents();\n");
+        $compiler->write("ob_end_clean();\n");
         if (null !== $this->getAttribute('ttl')) {
             $compiler->write("\$_manubo_cached_ttl = (int) ");
             $compiler->subcompile($this->getAttribute('ttl'));
@@ -48,6 +49,6 @@ class CachedNode extends \Twig_Node
         $compiler->write("\$_manubo_cache->save(\$_manubo_cached_key, \$_manubo_cached_body, \$_manubo_cached_ttl);\n");
         $compiler->outdent();
         $compiler->write("}\n");
-        $compiler->write("eval(\$_manubo_cached_body);\n");
+        $compiler->write("echo \$_manubo_cached_body;\n");
     }
 }
