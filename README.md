@@ -3,7 +3,7 @@ twig-cached-extension
 
 Extension for caching html fragments
 
-# Usage
+## Usage
 
 Using this Twig extension can be done as follows.
 
@@ -31,3 +31,16 @@ $twig->addExtension($cachedExtension);
 	<p>Hello World!</p>
 {% endcached %}
 ```
+
+## The `cached` tag
+The `cached` tag accepts two parameters
+* an array defining the cache key
+* an integer as the expiry time in seconds, if supported by the cache
+
+### Cache key
+If the cache key contains an object, any of the following properties and its' equivalent getters are tested for composing the final cache key:
+* updated_at, updatedAt, get_updated_at(), getUpdatedAt()
+* modified_at, modifiedAt, get_modified_at(), getModifiedAt()
+* last_updated, lastUpdated, get_last_updated(), getLastUpdated()
+* last_modified, lastModified, get_last_modified(), getLastModified()
+
