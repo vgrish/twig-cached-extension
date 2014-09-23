@@ -52,3 +52,5 @@ where `model` is an object with property `model.updated_at = \DateTime("2014-09-
 
 `"foo_1411478115"`.
 
+Whenever the model changes and the `model.updated_at` gets updated, the current key would invalidate, resulting the include to re-render.
+
