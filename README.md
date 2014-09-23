@@ -45,7 +45,10 @@ If the cache key contains an object, any of the following properties and its' eq
 * last_modified, lastModified, get_last_modified(), getLastModified()
 
 For example, the following cache key
+
 `['foo', model]`
+
 where `model` is an object with property `model.updated_at = \DateTime("2014-09-23 15:15:15")`, the resulting key would be:
+
 `"foo_1411478115"`.
 
