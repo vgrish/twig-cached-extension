@@ -6,6 +6,7 @@ Extension for caching html fragments
 # Usage
 
 Using this Twig extension can be done as follows.
+
 1. Register the Cached Extension
 ```php
 use Doctrine\Common\Cache\RedisCache;
@@ -23,6 +24,7 @@ $loader = new Twig_Loader_String(); // use any other loader strategy as required
 $twig = new Twig_Environment($loader);
 $twig->addExtension($cachedExtension);
 ```
+
 2. Cache HTML includes
 ```html
 {% cached ["set", "your", "cache", "key", "here"] %}
