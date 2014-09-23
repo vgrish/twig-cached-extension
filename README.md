@@ -1,7 +1,7 @@
 twig-cached-extension
 =====================
 
-Extension for caching html fragments
+Extension for caching html includes in Twig
 
 ## Usage
 
