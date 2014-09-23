@@ -24,7 +24,7 @@ $twig = new Twig_Environment($loader);
 $twig->addExtension($cachedExtension);
 ```
 2. Cache HTML includes
-```html
+```twig
 {% cached ["set", "your", "cache", "key", "here"] %}
 	<p>Hello World!</p>
 {% endcached %}
